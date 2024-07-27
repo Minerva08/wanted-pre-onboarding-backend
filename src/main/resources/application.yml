@@ -1,0 +1,30 @@
+# application.yml
+spring:
+  application:
+    name: preboarding
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/wanted?useSSL=false&useUnicode=true&serverTimezone=Asia/Seoul
+    username: root
+    password: qwe123!@#
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+
+
+# Server configuration
+server:
+  port: 8080
+
+# Logging configuration
+logging:
+  level:
+    root: INFO  # Default logging level
+    com.example.preboarding: DEBUG  # Package
+
+
+
