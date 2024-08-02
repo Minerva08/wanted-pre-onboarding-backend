@@ -11,6 +11,6 @@ public interface JobPositionRepositoryCustom {
 
     List<JobPosition> findCompanyOtherPosition(Long comNum, Long postNum);
 
-    Page<JobPosition> searchPosition(String comName, List<Long>  roleNum, Pageable pageable);
+    Page<JobPosition> searchPosition(String comName,String region,String nation, List<Long> roleNums, Pageable pageable);
 
 }

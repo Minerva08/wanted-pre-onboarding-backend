@@ -1,9 +1,17 @@
 package com.example.preboarding.repository;
 
 import com.example.preboarding.domain.JobPosition;
+import com.example.preboarding.domain.QCompany;
+import com.example.preboarding.domain.QCompanyRole;
+import com.example.preboarding.domain.QJobPosition;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.NumberPath;
+import com.querydsl.core.types.dsl.StringPath;
+import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.TypedQuery;
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -14,9 +22,12 @@ import java.util.List;
 
 @Repository
 @Transactional
+@AllArgsConstructor
 public class JobPositionRepositoryImpl implements JobPositionRepositoryCustom{
     @PersistenceContext
     private EntityManager em;
+
+    private final JPAQueryFactory jpaQueryFactory;
 
     @Override
     public JobPosition findByIdDetail(Long jobPositionNum){
@@ -30,28 +41,73 @@ public class JobPositionRepositoryImpl implements JobPositionRepositoryCustom{
                 .setParameter("postNum",postNum)
                 .getResultList();
     }
-
-
+    @Override
     public Page<JobPosition> searchPosition(String comName,String region,String nation, List<Long> roleNums, Pageable pageable) {
-        String queryStr = "select j from JobPosition j inner join j.company c inner join j.companyRole cr where c.comName ilike :comName and c.region=:region and c.nation= :nation and cr.role.roleNum in :roleNums";
-        TypedQuery<JobPosition> query = em.createQuery(queryStr, JobPosition.class)
-                .setParameter("comName", "%" + comName + "%")
-                .setParameter("roleNums",roleNums)
-                .setParameter("region",region)
-                .setParameter("nation",nation)
-                .setFirstResult((int) pageable.getOffset())
-                .setMaxResults(pageable.getPageSize());
+        QJobPosition jobPosition = QJobPosition.jobPosition;
+        QCompany company = QCompany.company;
+        QCompanyRole companyRole = QCompanyRole.companyRole;
 
-        List<JobPosition> jobPositions = query.getResultList();
+        // Create the base query
+        JPAQuery<JobPosition> query = jpaQueryFactory.selectFrom(jobPosition)
+                .join(jobPosition.company, company)
+                .join(jobPosition.companyRole, companyRole)
+                .where(
+                        comNameCondition(comName, company.comName),
+                        regionCondition(region, company.region),
+                        nationCondition(nation, company.nation),
+                        roleNumCondition(roleNums, companyRole.role.roleNum)
+                );
 
-        String countQueryStr = "select count(j) from JobPosition j inner join j.company c inner join j.companyRole cr where c.comName ilike :comName and cr.role.roleNum in :roleNums";
-        TypedQuery<Long> countQuery = em.createQuery(countQueryStr, Long.class)
-                .setParameter("comName", "%" + comName + "%")
-                .setParameter("roleNums",roleNums)
-                .setFirstResult((int) pageable.getOffset())
-                .setMaxResults(pageable.getPageSize());
-        Long count = countQuery.getSingleResult();
+        // Fetch results with pagination
+        List<JobPosition> jobPositions = query
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        // Count query for pagination
+        Long count = jpaQueryFactory.select(jobPosition.count())
+                .from(jobPosition)
+                .join(jobPosition.company, company)
+                .join(jobPosition.companyRole, companyRole)
+                .where(
+                        comNameCondition(comName, company.comName),
+                        regionCondition(region, company.region),
+                        nationCondition(nation, company.nation),
+                        roleNumCondition(roleNums, companyRole.role.roleNum)
+                )
+                .fetchOne();
 
         return new PageImpl<>(jobPositions, pageable, count);
     }
+
+    private BooleanExpression comNameCondition(String comName, StringPath comNamePath) {
+        if (comName == null || comName.isEmpty()) {
+            return null;
+        }
+        return comNamePath.containsIgnoreCase(comName);
+    }
+
+    private BooleanExpression regionCondition(String region, StringPath regionPath) {
+        if (region == null || region.isEmpty()) {
+            return null;
+        }
+        return regionPath.eq(region);
+    }
+
+    private BooleanExpression nationCondition(String nation, StringPath nationPath) {
+        if (nation == null || nation.isEmpty()) {
+            return null;
+        }
+        return nationPath.eq(nation);
+    }
+
+    private BooleanExpression roleNumCondition(List<Long> roleNums, NumberPath<Long> roleNumPath) {
+        if (roleNums == null || roleNums.isEmpty()) {
+            return null;
+        }
+        return roleNumPath.in(roleNums);
+    }
+
+
+
 }

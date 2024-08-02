@@ -4,7 +4,6 @@ import com.example.preboarding.domain.*;
 import com.example.preboarding.repository.CompanyRoleRepository;
 import com.example.preboarding.repository.JobPositionRepository;
 import com.example.preboarding.service.JobPositionsService;
-import org.hamcrest.Matcher;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -52,7 +50,7 @@ public class JobPostioning {
                 .reward(500000)
                 .postTitle("네이버 서버 개발자")
                 .contents("3년 이상의 서버 개발 경험...")
-                .companyRole(companyRoleRepository.findById(2l).get())
+                .companyRole(companyRoleRepository.findById(20l).get())
                 .date(date)
                 .build();
 
@@ -149,10 +147,10 @@ public class JobPostioning {
         List<Long>  roleNum = new ArrayList<>();
         roleNum.add(3l);
         roleNum.add(9l);
-        String national = "한국";
+        String nation = "한국";
         String region="강남구";
         Pageable pageable = PageRequest.of(0, 10);
-        Page<JobPosition> searchJobPositions = jobPositionRepository.searchPosition(comName, roleNum, pageable);
+        Page<JobPosition> searchJobPositions = jobPositionRepository.searchPosition(comName,region,nation,roleNum, pageable);
 
         for (JobPosition searchJobPosition : searchJobPositions) {
             assertThat(roleNum,hasItem(searchJobPosition.getCompanyRole().getRole().getRoleNum()));
