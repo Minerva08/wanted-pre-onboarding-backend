@@ -7,6 +7,19 @@ spring:
     url: jdbc:mysql://localhost:3306/wanted?useSSL=false&useUnicode=true&serverTimezone=Asia/Seoul
     username: root
     password: qwe123!@#
+    p6spy:
+      appender: com.p6spy.engine.spy.appender.Slf4JLogger
+      # JDBC 이벤트 로깅을 위한 P6LogFactory 등록
+      enable-logging: true
+      # com.p6spy.engine.spy.appender.MultiLineFormat 사용 (SingleLineFormat 대신)
+      multiline: true
+      # 기본 리스너들을 위한 로깅 사용 [slf4j, sysout, file, custom]
+      logging: slf4j
+      # 실제 값으로 '?'를 대체한 효과적인 SQL 문자열을 추적 시스템에 보고
+      tracing:
+        include-parameter-values: true
+      logMessageFormat:
+        p6spy: "%(currentTime)|%(executionTime)|%(category)|%(sqlSingleLine)"
   jpa:
     show-sql: true
     hibernate:
@@ -24,7 +37,8 @@ server:
 logging:
   level:
     root: INFO  # Default logging level
-    com.example.preboarding: DEBUG  # Package
+
+
 
 
 
