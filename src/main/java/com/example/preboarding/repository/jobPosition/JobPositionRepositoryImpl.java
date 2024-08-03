@@ -1,9 +1,7 @@
-package com.example.preboarding.repository;
+package com.example.preboarding.repository.jobPosition;
 
-import com.example.preboarding.domain.JobPosition;
-import com.example.preboarding.domain.QCompany;
-import com.example.preboarding.domain.QCompanyRole;
-import com.example.preboarding.domain.QJobPosition;
+import com.example.preboarding.domain.*;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.core.types.dsl.StringPath;
@@ -17,8 +15,16 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import com.example.preboarding.domain.QCompany;
+import com.example.preboarding.domain.QCompanyRole;
+import com.example.preboarding.domain.QJobPosition;
 
 import java.util.List;
+
+import static com.example.preboarding.domain.QCompany.company;
+import static com.example.preboarding.domain.QCompanyRole.companyRole;
+import static com.example.preboarding.domain.QJobPosition.jobPosition;
+import static com.example.preboarding.domain.QRole.role;
 
 @Repository
 @Transactional
@@ -36,10 +42,22 @@ public class JobPositionRepositoryImpl implements JobPositionRepositoryCustom{
 
     @Override
     public List<JobPosition> findCompanyOtherPosition(Long comNum, Long postNum){
-        return em.createQuery("select j from JobPosition as j inner join j.company as c where c.comNum = :comNum and j.num != :postNum",JobPosition.class)
-                .setParameter("comNum",comNum)
-                .setParameter("postNum",postNum)
-                .getResultList();
+
+        BooleanBuilder builder = new BooleanBuilder();
+        builder.and(company.comNum.eq(comNum));
+
+        if (postNum != null) {
+            builder.and(jobPosition.num.ne(postNum));
+        }
+
+        return jpaQueryFactory.selectDistinct(jobPosition)
+                .from(jobPosition)
+                .join(jobPosition.companyRole, companyRole).fetchJoin()  // CompanyRole을 fetch join
+                .join(companyRole.company, company).fetchJoin()           // CompanyRole을 통해 Company와 fetch join
+                .join(companyRole.role, role).fetchJoin()                 // CompanyRole을 통해 Role과 fetch join
+                .where(builder)
+                .fetch();
+
     }
     @Override
     public Page<JobPosition> searchPosition(String comName,String region,String nation, List<Long> roleNums, Pageable pageable) {

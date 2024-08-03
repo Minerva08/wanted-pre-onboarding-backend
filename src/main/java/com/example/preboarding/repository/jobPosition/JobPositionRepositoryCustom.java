@@ -1,4 +1,4 @@
-package com.example.preboarding.repository;
+package com.example.preboarding.repository.jobPosition;
 
 import com.example.preboarding.domain.JobPosition;
 import org.springframework.data.domain.Page;

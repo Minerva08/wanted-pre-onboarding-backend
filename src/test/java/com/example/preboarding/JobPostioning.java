@@ -1,9 +1,9 @@
 package com.example.preboarding;
 
 import com.example.preboarding.domain.*;
-import com.example.preboarding.repository.CompanyRoleRepository;
-import com.example.preboarding.repository.JobPositionRepository;
-import com.example.preboarding.service.JobPositionsService;
+import com.example.preboarding.repository.companyRole.CompanyRoleRepository;
+import com.example.preboarding.repository.jobPosition.JobPositionRepository;
+import com.example.preboarding.repository.role.RoleRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -26,13 +27,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 public class JobPostioning {
-
-    @Autowired
-    private JobPositionsService jobPositionService;
+    
     @Autowired
     private JobPositionRepository jobPositionRepository;
     @Autowired
     private CompanyRoleRepository companyRoleRepository;
+    @Autowired
+    private RoleRepository roleRepository;
 
     @Test
     @Rollback(value = false)
@@ -45,70 +46,96 @@ public class JobPostioning {
         date.setStartDate(LocalDateTime.of(2024,8,1,11,0));
         date.setEndDate(LocalDateTime.of(2024,8,5,23,0));
 
+        Long comNum = 3l;
 
-        JobPosition jobPosition =JobPosition.builder()
-                .reward(500000)
-                .postTitle("네이버 서버 개발자")
-                .contents("3년 이상의 서버 개발 경험...")
-                .companyRole(companyRoleRepository.findById(20l).get())
-                .date(date)
-                .build();
+        List<Role> allRoleByCompany = roleRepository.findAllByCompanyNum(comNum);
 
-        Long postNum = jobPositionService.registPosition(jobPosition);
-        JobPosition jobPositionDetail = jobPositionRepository.findByIdDetail(postNum);
+        if(allRoleByCompany.size() > 0) {
 
-        assert(jobPositionDetail).getNum().equals(postNum);
+            allRoleByCompany.stream().forEach(e -> {
+                System.out.println("회사가 공고를 올리지 않은 직무 : " + e.getRoleNum() + "," + e.getRoleId() + "," + e.getRoleName());
+            });
+
+            CompanyRole registCompanyRole = companyRoleRepository.findByCompanyNumAndRoleNum(comNum, allRoleByCompany.get(0).getRoleNum());
+
+
+            System.out.println("companyRoleNum : " + registCompanyRole.getCompanyRoleNum());
+            System.out.println("companyNum:" + registCompanyRole.getCompany().getComNum());
+            System.out.println("roleNum:" + registCompanyRole.getRole().getRoleNum());
+
+
+            JobPosition jobPosition = JobPosition.builder()
+                    .reward(500000)
+                    .postTitle("FE 채용")
+                    .contents("필드 엔지니어")
+                    .companyRole(registCompanyRole)
+                    .date(date)
+                    .build();
+
+            JobPosition save = jobPositionRepository.save(jobPosition);
+            assertNotNull(save, "채용공고가 등록되지 않았습니다");
+        }else{
+            System.out.println("채용 공고로 등록되지 않은 직무가 없습니다");
+        }
     }
 
     @Test
     @Rollback(value = false)
     @DisplayName("2. 채용 공고 수정")
     public void modifyJobPosition(){
-        JobPosition existingJobPosition = jobPositionRepository.findById(15l).get();
-        CompanyRole companyRole = companyRoleRepository.findById(existingJobPosition.getNum()).get();
-        Company company = companyRole.getCompany();
-        Role updateRole = Role.builder().roleNum(3l).build();
-        Long byCompanyNumAndRoleNum = companyRoleRepository.findByCompanyNumAndRoleNum(company.getComNum(), updateRole.getRoleNum());
+        Long changeRoleNum = 16l;
 
+        JobPosition existingJobPosition = jobPositionRepository.findById(23l).get();
 
-        CompanyRole modCompanyRole = CompanyRole.builder().num(byCompanyNumAndRoleNum).role(updateRole).company(company).build();
+        List<JobPosition> otherPositionList = jobPositionRepository.findCompanyOtherPosition(existingJobPosition.getCompany().getComNum(), existingJobPosition.getNum());
 
-        String modSkill = new StringBuilder().append("java").append(",").append("MySQL").toString();
-        String modContents = "2년차 백엔드";
-        String modTitle = "서버 개발자";
+        Optional<JobPosition> already = otherPositionList.stream()
+                .filter(e -> e.getCompanyRole().getRole().getRoleNum().equals(changeRoleNum))
+                .findFirst();
 
-        Date modDate = new Date();
-        modDate.setUpdateDate(LocalDateTime.now());
-        modDate.setStartDate(existingJobPosition.getDate().getStartDate().plusDays(2));
-        modDate.setEndDate(existingJobPosition.getDate().getEndDate().plusDays(7));
-        modDate.setCreateDate(existingJobPosition.getDate().getCreateDate());
+        if(already.isPresent()){
+            System.out.println("이미 등록된 공고 : "+already.get().getNum());
 
-        System.out.println("startDate : "+existingJobPosition.getDate().getStartDate());
-        System.out.println("endDate : "+existingJobPosition.getDate().getStartDate());
+        }else{
 
+            Role updateRole = Role.builder().roleNum(changeRoleNum).build();
+            Long byCompanyNumAndRoleNum = companyRoleRepository.findByCompanyNumAndRoleNum(existingJobPosition.getCompany().getComNum(), updateRole.getRoleNum()).getCompanyRoleNum();
 
+            CompanyRole modCompanyRole = CompanyRole.builder().num(byCompanyNumAndRoleNum).role(updateRole).company(existingJobPosition.getCompany()).build();
 
-        JobPosition updateInfo = JobPosition.builder()
-                .postNum(existingJobPosition.getNum())
-                .postTitle(modTitle)
-                .companyRole(modCompanyRole)
-                .contents(modContents)
-                .skill(modSkill)
-                .date(modDate)
-                .reward(existingJobPosition.getReward())
-                .applyCnt(existingJobPosition.getApplyCnt())
-                .build();
+            String modSkill = new StringBuilder().append("linux").append(",").append("onPremiss").toString();
+            String modContents = "5년 이상 경력 \n 병원 관련 도메인 업무 경험 우대";
+            String modTitle = "IOT 스마트 병동 필드엔지니어 모집";
 
-        JobPosition save = jobPositionRepository.save(updateInfo);
-        assertEquals(existingJobPosition.getNum(),save.getNum());
-        assertEquals(modContents,save.getContents(),"채용 공고 내용이 변경되었습니다");
-        assertEquals(modDate.getStartDate(),save.getDate().getStartDate(),"채용 시작 일정이 변경되었습니다");
-        assertEquals(modDate.getEndDate(),save.getDate().getEndDate(),"채용 종료 일정이 변경되었습니다");
-        assertEquals(modDate.getUpdateDate(),save.getDate().getUpdateDate(),"채용 공고 수정 일자가 변경되었습니다");
-        assertEquals(modTitle, save.getPostTitle(), "제목이 수정되지 않았습니다.");
-        assertEquals(modContents, save.getContents(), "내용이 수정되지 않았습니다.");
-        assertEquals(modSkill,save.getSkill(), "기술 스택이 수정되지 않았습니다.");
+            Date modDate = Date.builder()
+                    .startDate(existingJobPosition.getDate().getStartDate().plusDays(3))
+                    .endDate(existingJobPosition.getDate().getStartDate().plusDays(3))
+                    .createDate(existingJobPosition.getDate().getCreateDate())
+                    .updateDate(LocalDateTime.now())
+                    .build();
 
+            JobPosition updateInfo = JobPosition.builder()
+                    .postNum(existingJobPosition.getNum())
+                    .postTitle(modTitle)
+                    .companyRole(modCompanyRole)
+                    .contents(modContents)
+                    .skill(modSkill)
+                    .date(modDate)
+                    .reward(existingJobPosition.getReward())
+                    .applyCnt(existingJobPosition.getApplyCnt())
+                    .build();
+
+            JobPosition save = jobPositionRepository.save(updateInfo);
+            assertEquals(existingJobPosition.getNum(),save.getNum());
+            assertEquals(existingJobPosition.getCompany().getComNum(),save.getCompany().getComNum(),"회사정보가 변경되었습니다");
+            assertEquals(modContents,save.getContents(),"채용 공고 내용이 변경되었습니다");
+            assertEquals(modDate.getStartDate(),save.getDate().getStartDate(),"채용 시작 일정이 변경되었습니다");
+            assertEquals(modDate.getEndDate(),save.getDate().getEndDate(),"채용 종료 일정이 변경되었습니다");
+            assertEquals(modDate.getUpdateDate(),save.getDate().getUpdateDate(),"채용 공고 수정 일자가 변경되었습니다");
+            assertEquals(modTitle, save.getPostTitle(), "제목이 수정되지 않았습니다.");
+            assertEquals(modContents, save.getContents(), "내용이 수정되지 않았습니다.");
+            assertEquals(modSkill,save.getSkill(), "기술 스택이 수정되지 않았습니다.");
+        }
 
 
     }
@@ -180,56 +207,20 @@ public class JobPostioning {
     @DisplayName("5-1. 사내 다른 직무 채용 공고 목록")
     public void getCompanyOtherPosition(){
 
-        Long postNum = 17l;
-        Long comNum=2l;
+        Long postNum = 8l;
+        Long comNum=1l;
 
-        List<JobPosition> otherJobPositionByCompany = jobPositionRepository.findCompanyOtherPosition(comNum, postNum);
-        int cnt = otherJobPositionByCompany.size();
+        List<JobPosition> otherPositionList1 = jobPositionRepository.findCompanyOtherPosition(comNum, postNum);
+        int cnt = otherPositionList1.size();
         System.out.println("totalCnt1 : "+ cnt);
 
-        for (JobPosition otherPositionList1 : otherJobPositionByCompany) {
-            System.out.println("================================================================");
-            System.out.println("CompanyNum : "+otherPositionList1.getCompany().getComNum());
-            System.out.println("CompanyName : "+otherPositionList1.getCompany().getComName());
-            System.out.println("CompanyPositioning roleNum : "+otherPositionList1.getCompanyRole().getRole().getRoleNum());
-            System.out.println("CompanyPositioning roleName : "+otherPositionList1.getCompanyRole().getRole().getRoleName());
-            System.out.println("================================================================");
-
-        }
-
-        JobPosition jobPosition = jobPositionRepository.findById(postNum).get();
-
-        List<JobPosition> otherPositionList2 = jobPosition.getCompany().getJobPositionList().stream().filter(jobPosition1 -> !jobPosition1.getNum().equals(postNum)).toList();
-        System.out.println("totalCnt2 : "+ otherPositionList2.size());
-
-        for (JobPosition position : otherPositionList2) {
-            System.out.println("================================================================");
+        for (JobPosition position : otherPositionList1) {
             System.out.println("CompanyNum : "+position.getCompany().getComNum());
             System.out.println("CompanyName : "+position.getCompany().getComName());
             System.out.println("CompanyPositioning roleNum : "+position.getCompanyRole().getRole().getRoleNum());
             System.out.println("CompanyPositioning roleName : "+position.getCompanyRole().getRole().getRoleName());
-            System.out.println("================================================================");
 
         }
-
-
-    }
-
-    @Test
-    @Transactional(readOnly = true)
-    @DisplayName("+회사별 직무 목록")
-    public void roleByCompany(){
-        Long comNum = 2l;
-        List<CompanyRole> companyRole = companyRoleRepository.findAllByCompanyNum(comNum);
-        companyRole.stream().forEach(e->
-                {
-                    System.out.println("comNum"+e.getCompany().getComNum());
-                    assertEquals(comNum,e.getCompany().getComNum());
-                    System.out.println("companyRoleNum : "+e.getCompanyRoleNum());
-                    System.out.println("roleNum : "+e.getRole().getRoleNum());
-
-                }
-        );
 
     }
 

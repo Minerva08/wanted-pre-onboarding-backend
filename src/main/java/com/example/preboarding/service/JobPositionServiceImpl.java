@@ -1,7 +1,7 @@
 package com.example.preboarding.service;
 
 import com.example.preboarding.domain.JobPosition;
-import com.example.preboarding.repository.JobPositionRepository;
+import com.example.preboarding.repository.jobPosition.JobPositionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
