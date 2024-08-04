@@ -19,7 +19,7 @@ public class Apply {
     @SequenceGenerator(name = "apply_seq_generator", sequenceName = "apply_sequence",
             initialValue = 1, allocationSize = 1)
     private Long applyNum;
-    @OneToOne(fetch = FetchType.LAZY,cascade = CascadeType.PERSIST,orphanRemoval = true)
+    @OneToOne(fetch = FetchType.LAZY,cascade = CascadeType.PERSIST)
     @JoinColumn(name="user_num")
     private User user;
     @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.PERSIST)

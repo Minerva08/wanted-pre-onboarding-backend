@@ -42,7 +42,7 @@ public class Applying {
     @Rollback(value = false)
     public void applyingPosition() throws Exception {
 
-        User user = userRepository.findById(4l)
+        User user = userRepository.findById(1l)
                 .orElseThrow(() -> new NoSuchElementException("User not found with ID"));
 
         if(user.getApplyStatus()){
