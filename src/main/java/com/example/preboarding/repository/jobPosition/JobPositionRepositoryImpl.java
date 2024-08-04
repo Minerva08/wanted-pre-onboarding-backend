@@ -61,9 +61,6 @@ public class JobPositionRepositoryImpl implements JobPositionRepositoryCustom{
     }
     @Override
     public Page<JobPosition> searchPosition(String comName,String region,String nation, List<Long> roleNums, Pageable pageable) {
-        QJobPosition jobPosition = QJobPosition.jobPosition;
-        QCompany company = QCompany.company;
-        QCompanyRole companyRole = QCompanyRole.companyRole;
 
         // Create the base query
         JPAQuery<JobPosition> query = jpaQueryFactory.selectFrom(jobPosition)

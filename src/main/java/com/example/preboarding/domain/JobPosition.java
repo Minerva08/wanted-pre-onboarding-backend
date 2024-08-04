@@ -4,10 +4,7 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,7 +31,7 @@ public class JobPosition {
     private int applyCnt;
     private String skill;
     private Date date;
-    @OneToMany(mappedBy = "jobPosition")
+    @OneToMany(mappedBy = "jobPosition",cascade = CascadeType.PERSIST, orphanRemoval = true)
     private List<Apply> applyList = new ArrayList<>();
     @Builder
     public JobPosition(Long postNum, String postTitle, CompanyRole companyRole, String contents, String skill,int applyCnt, int reward, Date date) {
@@ -49,8 +46,9 @@ public class JobPosition {
         if(applyCnt!=0) this.applyCnt=applyCnt;
     }
 
-    public void addApplyList(Apply apply){
-        applyList.add(apply);
-        apply.setJobPosition(this);
+    public void incrementApplyCnt() {
+        this.applyCnt++;
     }
+
+
 }
