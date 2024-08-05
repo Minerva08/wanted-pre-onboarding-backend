@@ -15,10 +15,8 @@ import java.time.format.DateTimeFormatter;
 @Setter
 @NoArgsConstructor
 public class Date {
-
     @Transient
     private static final String formatter ="yyyy-MM-dd HH:mm:ss";
-
     private LocalDateTime createDate;
     private LocalDateTime updateDate;
     private LocalDateTime startDate;

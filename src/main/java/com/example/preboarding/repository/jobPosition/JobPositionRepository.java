@@ -8,7 +8,6 @@ import java.util.List;
 
 @Repository
 public interface JobPositionRepository extends JpaRepository<JobPosition,Long>, JobPositionRepositoryCustom{
-    JobPosition findByIdDetail(Long jobPositionNum);
     List<JobPosition> findCompanyOtherPosition(Long comNum, Long postNum);
 
 

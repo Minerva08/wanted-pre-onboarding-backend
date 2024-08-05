@@ -50,5 +50,9 @@ public class JobPosition {
         this.applyCnt++;
     }
 
+    public void decrementApplyCnt() {
+        this.applyCnt--;
+    }
+
 
 }

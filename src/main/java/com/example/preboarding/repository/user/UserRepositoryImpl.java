@@ -48,6 +48,8 @@ public class UserRepositoryImpl implements UserRepositoryCustom{
                         jobPosition.skill,
                         companyRole.role.roleId,
                         role.roleName, // Assuming you need roleName from Role
+                        company.comNum,
+                        company.comId,
                         company.comName,
                         company.region,
                         company.nation,

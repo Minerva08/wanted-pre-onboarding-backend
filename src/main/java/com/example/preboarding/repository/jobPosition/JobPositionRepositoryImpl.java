@@ -1,23 +1,25 @@
 package com.example.preboarding.repository.jobPosition;
 
 import com.example.preboarding.domain.*;
+import com.example.preboarding.exception.CustomException;
+import com.example.preboarding.exception.EnumResponseMessage;
+import com.example.preboarding.exception.HttpErrorCode;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.core.types.dsl.StringPath;
+import com.querydsl.jpa.impl.JPADeleteClause;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import com.example.preboarding.domain.QCompany;
-import com.example.preboarding.domain.QCompanyRole;
-import com.example.preboarding.domain.QJobPosition;
 
 import java.util.List;
 
@@ -30,15 +32,8 @@ import static com.example.preboarding.domain.QRole.role;
 @Transactional
 @AllArgsConstructor
 public class JobPositionRepositoryImpl implements JobPositionRepositoryCustom{
-    @PersistenceContext
-    private EntityManager em;
 
     private final JPAQueryFactory jpaQueryFactory;
-
-    @Override
-    public JobPosition findByIdDetail(Long jobPositionNum){
-        return em.find(JobPosition.class,jobPositionNum);
-    }
 
     @Override
     public List<JobPosition> findCompanyOtherPosition(Long comNum, Long postNum){
@@ -94,6 +89,7 @@ public class JobPositionRepositoryImpl implements JobPositionRepositoryCustom{
 
         return new PageImpl<>(jobPositions, pageable, count);
     }
+
 
     private BooleanExpression comNameCondition(String comName, StringPath comNamePath) {
         if (comName == null || comName.isEmpty()) {

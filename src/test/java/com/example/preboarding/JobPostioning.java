@@ -193,7 +193,7 @@ public class JobPostioning {
     @DisplayName("5. 채용 공고 상세 보기")
     public void getJobPositionDetail(){
         Long postNum = 17l;
-        JobPosition jobPositionDetail = jobPositionRepository.findByIdDetail(postNum);
+        JobPosition jobPositionDetail = jobPositionRepository.findById(postNum).get();
         assertEquals(jobPositionDetail.getNum(),postNum,"조회한 채용 공고의 번호가 다릅니다");
         System.out.println("JobPositionCompanyInfo"+jobPositionDetail.getCompany().toString());
         System.out.println("JobPositionRoleInfo"+jobPositionDetail.getCompanyRole().getRole().toString());
