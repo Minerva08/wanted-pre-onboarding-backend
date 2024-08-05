@@ -14,8 +14,11 @@ import java.util.List;
 @Getter
 @Setter
 public class JobPostInfoRes extends JobPositionPostRes {
-
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Integer pageNum;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<JobPost> jobPostList;
+    private JobPostDetail detail;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private List<SummaryJobPost> otherPostList;
 
@@ -30,14 +33,46 @@ public class JobPostInfoRes extends JobPositionPostRes {
         private Long comNum;
         private String comId;
         private String comName;
+        private int reward;
+        private int applyCnt;
+        private String skill;
+        private Date date;
+        @Builder
+        public JobPost(JobPosition jobPosition) {
+            this.postNum = jobPosition.getNum();
+            this.postTitle = jobPosition.getPostTitle();
+            this.roleId = jobPosition.getCompanyRole().getRole().getRoleId(); // Assume CompanyRole can be used as Role
+            this.roleNum = jobPosition.getCompanyRole().getRole().getRoleNum(); // Assume CompanyRole can be used as Role
+            this.roleName = jobPosition.getCompanyRole().getRole().getRoleName(); // Assume CompanyRole can be used as Role
+            this.comNum = jobPosition.getCompany().getComNum();
+            this.comId = jobPosition.getCompany().getComId();
+            this.comName = jobPosition.getCompany().getComName();
+            this.reward = jobPosition.getReward();
+            this.applyCnt = jobPosition.getApplyCnt();
+            this.skill = jobPosition.getSkill();
+            this.date = jobPosition.getDate();
+        }
+
+    }
+
+    @Getter
+    @Setter
+    public static class JobPostDetail {
+        private Long postNum;
+        private String postTitle;
+        private Long roleNum;
+        private String roleId;
+        private String roleName;
+        private Long comNum;
+        private String comId;
+        private String comName;
         private String contents;
         private int reward;
         private int applyCnt;
         private String skill;
         private Date date;
-        // JobPosition 객체를 받아 JobPost 객체를 초기화하는 생성자
         @Builder
-        public JobPost(JobPosition jobPosition) {
+        public JobPostDetail(JobPosition jobPosition) {
             this.postNum = jobPosition.getNum();
             this.postTitle = jobPosition.getPostTitle();
             this.roleId = jobPosition.getCompanyRole().getRole().getRoleId(); // Assume CompanyRole can be used as Role

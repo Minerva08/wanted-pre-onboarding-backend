@@ -66,13 +66,15 @@ public class JobPositionServiceImpl implements JobPositionsService {
 
     @Override
     @Transactional(readOnly = true)
-    public JobPostInfoRes searchJobPostionPost(String comName, String nation, String region, int[] roleArray, Pageable pageable) {
+    public JobPostInfoRes searchJobPostionPost(String comName, String nation, String region, String[] roleArray, Pageable pageable) {
+
         JobPostSearchDTO searchDTO = JobPostSearchDTO.builder()
                 .comName(comName)
                 .pageable(pageable)
-                .roleNumList(Arrays.stream(roleArray)
-                        .mapToObj(Long::valueOf)
-                        .collect(Collectors.toList())
+                .roleNumList(
+                        roleArray==null?
+                                new ArrayList<>():
+                                Arrays.stream(roleArray).toList().stream().mapToLong(Long::valueOf).boxed().toList()
                 )
                 .nation(nation)
                 .region(region)
@@ -96,16 +98,12 @@ public class JobPositionServiceImpl implements JobPositionsService {
     public JobPostInfoRes getJobPostDetail(Long postNum) {
         JobPosition jobPostDetail = validJobPost(postNum);
 
-        List<JobPostInfoRes.JobPost> jobPostList = new ArrayList<>();
-        jobPostList.add(JobPostInfoRes.JobPost.builder().jobPosition(jobPostDetail).build());
-
         List<SummaryJobPost> otherPositionList = jobPositionRepository.findCompanyOtherPosition(jobPostDetail.getCompany().getComNum(), jobPostDetail.getNum())
                 .stream().map(SummaryJobPost::new).toList();
 
         return JobPostInfoRes.builder()
-                .jobPostList(jobPostList)
-                .otherPostList(otherPositionList)
-                .build();
+                .detail(JobPostInfoRes.JobPostDetail.builder().jobPosition(jobPostDetail).build())
+                .otherPostList(otherPositionList).build();
     }
 
     private JobPosition validJobPost(Long postNum) {

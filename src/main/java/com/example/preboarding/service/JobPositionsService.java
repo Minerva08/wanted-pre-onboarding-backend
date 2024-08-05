@@ -12,7 +12,7 @@ public interface JobPositionsService {
 
     Long registPosition(JobPostionAddReq jobPosition);
 
-    JobPostInfoRes searchJobPostionPost(String comName, String nation, String region, int[] roleArray, Pageable pageable);
+    JobPostInfoRes searchJobPostionPost(String comName, String nation, String region, String[] roleArray, Pageable pageable);
 
     JobPostInfoRes getJobPostDetail(Long postNum);
 

@@ -14,12 +14,16 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.data.domain.Pageable;
+
+import java.util.List;
 
 @RestController
 @AllArgsConstructor
@@ -65,7 +69,12 @@ public class JobPositionController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = CustomException.class))),
             @ApiResponse(responseCode = "504", description = "Gateway Timeout", content = @Content(schema = @Schema(implementation = CustomException.class))),
     })
-    public JobPostInfoRes searchJobPost(@Parameter String nation, @Parameter String region, @Parameter String comName, @RequestParam(value = "role") int[] roleArray , Pageable pageable){
+    public JobPostInfoRes searchJobPost(
+            @RequestParam(name = "nation", required = false) String nation,
+            @RequestParam(name = "region", required = false) String region,
+            @RequestParam(name = "comName", required = false) String comName,
+            @RequestParam(name = "roleArr", required = false) String[] roleArray,
+        @PageableDefault(size = 10) Pageable pageable) {
         try{
             JobPostInfoRes searchList = jobPositionsService.searchJobPostionPost(comName,nation,region,roleArray,pageable);
 
