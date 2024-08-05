@@ -1,6 +1,7 @@
 package com.example.preboarding;
 
 import com.example.preboarding.domain.*;
+import com.example.preboarding.dto.JobPostSearchDTO;
 import com.example.preboarding.repository.companyRole.CompanyRoleRepository;
 import com.example.preboarding.repository.jobPosition.JobPositionRepository;
 import com.example.preboarding.repository.role.RoleRepository;
@@ -16,8 +17,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -56,19 +59,21 @@ public class JobPostioning {
                 System.out.println("회사가 공고를 올리지 않은 직무 : " + e.getRoleNum() + "," + e.getRoleId() + "," + e.getRoleName());
             });
 
-            CompanyRole registCompanyRole = companyRoleRepository.findByCompanyNumAndRoleNum(comNum, allRoleByCompany.get(0).getRoleNum());
+            List<CompanyRole> registCompanyRole = companyRoleRepository.findByCompanyNumAndRoleNum(comNum, allRoleByCompany.get(0).getRoleNum());
 
+            registCompanyRole.forEach(e->{
 
-            System.out.println("companyRoleNum : " + registCompanyRole.getCompanyRoleNum());
-            System.out.println("companyNum:" + registCompanyRole.getCompany().getComNum());
-            System.out.println("roleNum:" + registCompanyRole.getRole().getRoleNum());
+                System.out.println("companyRoleNum : " + e.getCompanyRoleNum());
+                System.out.println("companyNum:" + e.getCompany().getComNum());
+                System.out.println("roleNum:" + e.getRole().getRoleNum());
+            });
 
 
             JobPosition jobPosition = JobPosition.builder()
                     .reward(500000)
                     .postTitle("FE 채용")
                     .contents("필드 엔지니어")
-                    .companyRole(registCompanyRole)
+                    .companyRole(registCompanyRole.stream().findFirst().get())
                     .date(date)
                     .build();
 
@@ -99,7 +104,7 @@ public class JobPostioning {
         }else{
 
             Role updateRole = Role.builder().roleNum(changeRoleNum).build();
-            Long byCompanyNumAndRoleNum = companyRoleRepository.findByCompanyNumAndRoleNum(existingJobPosition.getCompany().getComNum(), updateRole.getRoleNum()).getCompanyRoleNum();
+            Long byCompanyNumAndRoleNum = companyRoleRepository.findByCompanyNumAndRoleNum(existingJobPosition.getCompany().getComNum(), updateRole.getRoleNum()).stream().findFirst().get().getCompanyRoleNum();
 
             CompanyRole modCompanyRole = CompanyRole.builder().num(byCompanyNumAndRoleNum).role(updateRole).company(existingJobPosition.getCompany()).build();
 
@@ -171,16 +176,25 @@ public class JobPostioning {
     @DisplayName("4-2. 채용 공고 조회 및 검색(pagenation)")
     public void searchJobPositionList(){
         String comName = "카카오";
-        List<Long>  roleNum = new ArrayList<>();
-        roleNum.add(3l);
-        roleNum.add(9l);
+        int[] roleArray = new int[] {3, 9};
         String nation = "한국";
         String region="강남구";
         Pageable pageable = PageRequest.of(0, 10);
-        Page<JobPosition> searchJobPositions = jobPositionRepository.searchPosition(comName,region,nation,roleNum, pageable);
+
+        JobPostSearchDTO searchDto = JobPostSearchDTO.builder()
+                .comName(comName)
+                .pageable(pageable)
+                .roleNumList(Arrays.stream(roleArray)
+                        .mapToObj(Long::valueOf)
+                        .collect(Collectors.toList())
+                )
+                .nation(nation)
+                .region(region)
+                .build();
+        Page<JobPosition> searchJobPositions = jobPositionRepository.searchPosition(searchDto);
 
         for (JobPosition searchJobPosition : searchJobPositions) {
-            assertThat(roleNum,hasItem(searchJobPosition.getCompanyRole().getRole().getRoleNum()));
+            assertThat(Arrays.asList(roleArray),hasItem(searchJobPosition.getCompanyRole().getRole().getRoleNum()));
             assertThat(searchJobPosition.getCompany().getComName(),containsString(comName));
             System.out.println("josPost CompanyName: "+searchJobPosition.getCompany().getComName());
             System.out.println("josPostTitle: "+searchJobPosition.getPostTitle());

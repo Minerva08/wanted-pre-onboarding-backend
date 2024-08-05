@@ -1,6 +1,7 @@
 package com.example.preboarding.repository.jobPosition;
 
 import com.example.preboarding.domain.*;
+import com.example.preboarding.dto.JobPostSearchDTO;
 import com.example.preboarding.exception.CustomException;
 import com.example.preboarding.exception.EnumResponseMessage;
 import com.example.preboarding.exception.HttpErrorCode;
@@ -47,31 +48,31 @@ public class JobPositionRepositoryImpl implements JobPositionRepositoryCustom{
 
         return jpaQueryFactory.selectDistinct(jobPosition)
                 .from(jobPosition)
-                .join(jobPosition.companyRole, companyRole).fetchJoin()  // CompanyRole을 fetch join
-                .join(companyRole.company, company).fetchJoin()           // CompanyRole을 통해 Company와 fetch join
-                .join(companyRole.role, role).fetchJoin()                 // CompanyRole을 통해 Role과 fetch join
+                .join(jobPosition.companyRole, companyRole).fetchJoin()
+                .join(companyRole.company, company).fetchJoin()
+                .join(companyRole.role, role).fetchJoin()
                 .where(builder)
                 .fetch();
 
     }
     @Override
-    public Page<JobPosition> searchPosition(String comName,String region,String nation, List<Long> roleNums, Pageable pageable) {
+    public Page<JobPosition> searchPosition(JobPostSearchDTO search) {
 
         // Create the base query
         JPAQuery<JobPosition> query = jpaQueryFactory.selectFrom(jobPosition)
                 .join(jobPosition.company, company)
                 .join(jobPosition.companyRole, companyRole)
                 .where(
-                        comNameCondition(comName, company.comName),
-                        regionCondition(region, company.region),
-                        nationCondition(nation, company.nation),
-                        roleNumCondition(roleNums, companyRole.role.roleNum)
+                        comNameCondition(search.getComName(), company.comName),
+                        regionCondition(search.getRegion(), company.region),
+                        nationCondition(search.getNation(), company.nation),
+                        roleNumCondition(search.getRoleNumList(), companyRole.role.roleNum)
                 );
 
         // Fetch results with pagination
         List<JobPosition> jobPositions = query
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
+                .offset(search.getPageable().getOffset())
+                .limit(search.getPageable().getPageSize())
                 .fetch();
 
         // Count query for pagination
@@ -80,14 +81,14 @@ public class JobPositionRepositoryImpl implements JobPositionRepositoryCustom{
                 .join(jobPosition.company, company)
                 .join(jobPosition.companyRole, companyRole)
                 .where(
-                        comNameCondition(comName, company.comName),
-                        regionCondition(region, company.region),
-                        nationCondition(nation, company.nation),
-                        roleNumCondition(roleNums, companyRole.role.roleNum)
+                        comNameCondition(search.getComName(), company.comName),
+                        regionCondition(search.getRegion(), company.region),
+                        nationCondition(search.getNation(), company.nation),
+                        roleNumCondition(search.getRoleNumList(), companyRole.role.roleNum)
                 )
                 .fetchOne();
 
-        return new PageImpl<>(jobPositions, pageable, count);
+        return new PageImpl<>(jobPositions, search.getPageable(), count);
     }
 
 
