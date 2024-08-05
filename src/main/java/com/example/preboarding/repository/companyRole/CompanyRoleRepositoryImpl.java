@@ -10,6 +10,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 import static com.example.preboarding.domain.QCompany.company;
 import static com.example.preboarding.domain.QCompanyRole.companyRole;
 import static com.example.preboarding.domain.QRole.role;
@@ -23,7 +25,7 @@ public class CompanyRoleRepositoryImpl implements CompanyRoleRepositoryCustom{
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public CompanyRole findByCompanyNumAndRoleNum(Long comNum, Long roleNum) {
+    public List<CompanyRole> findByCompanyNumAndRoleNum(Long comNum, Long roleNum) {
         BooleanBuilder builder = new BooleanBuilder();
         builder.and(companyRole.company.comNum.eq(comNum));
 
@@ -35,7 +37,7 @@ public class CompanyRoleRepositoryImpl implements CompanyRoleRepositoryCustom{
                 .join(companyRole.company, company).fetchJoin()
                 .join(companyRole.role, role).fetchJoin()
                 .where(builder)
-                .fetchOne();
+                .stream().toList();
     }
 
 

@@ -99,7 +99,7 @@ public class CompanyByRole {
         Long deleteComNum = 2l;
 
         companyRepository.deleteById(deleteComNum);
-        CompanyRole byCompanyNumAndRoleNum = companyRoleRepository.findByCompanyNumAndRoleNum(deleteComNum, null);
+        List<CompanyRole> byCompanyNumAndRoleNum = companyRoleRepository.findByCompanyNumAndRoleNum(deleteComNum, null);
         assertNull(byCompanyNumAndRoleNum,"회사의 직무가 존재합니다");
 
         List<JobPosition> companyOtherPosition = jobPositionRepository.findCompanyOtherPosition(deleteComNum, null);
@@ -116,7 +116,7 @@ public class CompanyByRole {
     @DisplayName("사내 해당 직무 및 등록된 채용 공고 삭제")
     public void removePositionByCompany(){
 
-        Long deleteCompanyRoleNum = companyRoleRepository.findByCompanyNumAndRoleNum(1l, 16l).getCompanyRoleNum();
+        Long deleteCompanyRoleNum = companyRoleRepository.findByCompanyNumAndRoleNum(1l, 16l).stream().findFirst().get().getCompanyRoleNum();
 
         companyRoleRepository.deleteById(deleteCompanyRoleNum);
 

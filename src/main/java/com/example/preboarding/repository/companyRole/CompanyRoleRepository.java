@@ -11,6 +11,6 @@ import java.util.List;
 
 @Repository
 public interface CompanyRoleRepository extends JpaRepository<CompanyRole,Long>, CompanyRoleRepositoryCustom {
-    CompanyRole findByCompanyNumAndRoleNum(Long comNum, Long roleNum);
+    List<CompanyRole> findByCompanyNumAndRoleNum(Long comNum, Long roleNum);
 
 }

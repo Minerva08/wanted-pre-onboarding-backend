@@ -8,6 +8,6 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface CompanyRoleRepositoryCustom {
-    CompanyRole findByCompanyNumAndRoleNum(Long comNum, Long roleNum);
+    List<CompanyRole> findByCompanyNumAndRoleNum(Long comNum, Long roleNum);
 
 }
