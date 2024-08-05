@@ -1,8 +1,11 @@
 package com.example.preboarding.exception;
 
+import lombok.Getter;
+
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
 public class CustomException extends RuntimeException{
 
     private static final long serialVersionUID = 1L;
