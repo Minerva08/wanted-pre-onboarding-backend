@@ -5,6 +5,5 @@ import com.example.preboarding.dto.ApplyUserDTO;
 import java.util.List;
 
 public interface ApplyRepositoryCustom {
-    List<ApplyUserDTO> findByJobPosition(Long applyPostNum);
-
+    List<ApplyUserDTO> findByApplyNum(Long applyNum);
 }

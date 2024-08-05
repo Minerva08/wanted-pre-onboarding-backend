@@ -7,7 +7,6 @@ import lombok.ToString;
 
 import java.text.NumberFormat;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 @ToString
 @Getter
@@ -39,12 +38,12 @@ public class ApplyInfoDTO extends ApplyUserDTO {
     private LocalDateTime appliedDate;
 
 
-    public ApplyInfoDTO(Long applyNum, String userId, String userName, Long jobPostNum,
+    public ApplyInfoDTO(Long applyNum,Long userNum, String userId, String userName, Long jobPostNum,
                         String jobPositionTitle, String jobPositionContent, String skill,
                         String roleId, String roleName, String companyName,
                         String region, String nation,
                         int reward, LocalDateTime appliedDate) {
-        super(applyNum, userId, userName, jobPostNum);
+        super(applyNum, userNum,userId, userName, jobPostNum);
         this.jobPositionTitle = jobPositionTitle;
         this.jobPositionContent = jobPositionContent;
         this.skill = skill;

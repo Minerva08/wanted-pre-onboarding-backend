@@ -7,6 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface ApplyRepository extends JpaRepository<Apply,Long>, ApplyRepositoryCustom {
-    List<ApplyUserDTO> findByJobPosition(Long applyPostNum);
+    List<ApplyUserDTO> findByApplyNum(Long applyNum);
 
 }

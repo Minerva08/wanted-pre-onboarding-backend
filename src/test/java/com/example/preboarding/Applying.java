@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -88,16 +87,16 @@ public class Applying {
     @Transactional
     @Rollback(value = false)
     public void getApplyListByJobPosition(){
-        Long applyPostNum = 20l;
+        Long applyPostNum = 23l;
 
-        List<ApplyUserDTO> applies = applyRepository.findByJobPosition(applyPostNum);
+        List<ApplyUserDTO> applies = applyRepository.findByApplyNum(applyPostNum);
 
         assertThat(applies).isNotEmpty();
         applies.stream().forEach(
                 e -> {
                     System.out.println("applyNum : "+e.getApplyNum());
-                    System.out.println("userNum : "+e.getApplyNum());
-                    System.out.println("userId : "+e.getApplyNum());
+                    System.out.println("userName : "+e.getUserName());
+                    System.out.println("userId : "+e.getUserId());
                 }
         );
 
