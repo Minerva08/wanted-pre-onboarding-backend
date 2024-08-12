@@ -8,10 +8,10 @@ import lombok.Setter;
 @Getter
 public class RoleReq {
     @NotNull
-    @Schema(example = "1",description = "역할 ID")
+    @Schema(example = "Back-end",description = "역할 ID")
     String roleId;
     @NotNull
-    @Schema(example = "1",description = "역할명")
+    @Schema(example = "백엔드",description = "역할명")
     String roleName;
 
 }
