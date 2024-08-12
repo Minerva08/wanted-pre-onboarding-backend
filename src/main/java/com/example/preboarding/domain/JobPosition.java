@@ -22,7 +22,6 @@ public class JobPosition {
     private String postTitle;
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="company_role_num",nullable = false)
-    @Column(unique = true)
     private CompanyRole companyRole;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="com_num")
