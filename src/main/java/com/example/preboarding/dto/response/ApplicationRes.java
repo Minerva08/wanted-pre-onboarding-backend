@@ -18,6 +18,9 @@ public class ApplicationRes extends CommonResponse {
     @Schema(description = "지원한 채용 공고 번호" , example = "1")
     private Long jobPostNum;
     @NotNull
+    @Schema(description = "지원자 번호" , example = "1")
+    private Long userNum;
+    @NotNull
     @Schema(description = "지원자 ID" , example = "1")
     private String userId;
     @Schema(description = "지원 여부 상태" , example = "true")

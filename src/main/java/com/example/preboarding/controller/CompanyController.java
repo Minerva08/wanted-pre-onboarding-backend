@@ -26,7 +26,7 @@ import java.util.Optional;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/com")
+@RequestMapping("/companies")
 @Tag(name = "회사 관련 API", description = "Swagger API")
 public class CompanyController {
 

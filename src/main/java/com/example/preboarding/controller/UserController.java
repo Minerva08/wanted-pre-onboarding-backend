@@ -1,5 +1,6 @@
 package com.example.preboarding.controller;
 
+import com.example.preboarding.domain.User;
 import com.example.preboarding.dto.ApplyInfoDTO;
 import com.example.preboarding.dto.request.ApplicationReq;
 import com.example.preboarding.dto.response.ApplicationInfoRes;
@@ -41,6 +42,7 @@ public class UserController {
 
             response.setMessage("지원 완료 되었습니다");
             response.setStatus(HttpStatus.OK.value());
+            response.setUserNum(applyRequest.getUserNum());
             return response;
 
         }catch (CustomException e){
@@ -79,7 +81,7 @@ public class UserController {
 
 
     @GetMapping("/application/{userNum}")
-    @Operation(summary = "사용자의 지원 조회" ,description = "지원한 공고 정보")
+    @Operation(summary = "사용자의 지원 내역 조회" ,description = "지원한 공고 정보")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Request Success", content = @Content(schema = @Schema(implementation = ApplicationInfoRes.class))),
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(schema = @Schema(implementation = CustomException.class))),
@@ -89,14 +91,15 @@ public class UserController {
     })
     public ApplicationInfoRes getAppliedJobPosition(@PathVariable("userNum") @NotNull Long userNum){
         try{
+            User user = userService.getUserInfo(userNum);
             ApplyInfoDTO applicationInfo = userService.getApplication(userNum);
-            System.out.println(applicationInfo.toString());
 
             return ApplicationInfoRes.builder()
                     .status(HttpStatus.OK.value())
                     .message("지원 내역이 조회되었습니다.")
                     .applyInfo(applicationInfo)
-                    .userNum(userNum)
+                    .userNum(user.getUserNum())
+                    .userId(user.getUserId())
                     .build();
 
         }catch (CustomException e){

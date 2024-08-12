@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -89,6 +90,11 @@ public class UserServiceImpl implements UserService {
             return null;
         }
         return userRepository.findUserWithApplyAndJobPositionByUserNum(userNum);
+    }
+
+    @Override
+    public User getUserInfo(Long userNum) {
+        return userRepository.findById(userNum).get();
     }
 
     private Apply validateApply(Long applyNum) {

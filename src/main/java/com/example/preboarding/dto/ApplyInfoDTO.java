@@ -23,7 +23,7 @@ public class ApplyInfoDTO extends ApplyUserDTO {
     @Schema(example = "백엔드", description="직무명")
     private String roleName;
     @Schema(example = "1", description="회사번호")
-    private String companyNum;
+    private Long companyNum;
     @Schema(example = "wanted", description="회사Id")
     private String companyId;
     @Schema(example = "원티드", description="회사명")
@@ -34,13 +34,13 @@ public class ApplyInfoDTO extends ApplyUserDTO {
     private String nation;
     @Schema(example = "500,000", description="채용 보상금")
     private String reward;
-    @Schema(example = "2024-08-01 09:00:00", description="지원할 채용 공고 번호")
+    @Schema(example = "2024-08-01 09:00:00", description="지원 시각")
     private LocalDateTime appliedDate;
 
 
     public ApplyInfoDTO(Long applyNum,Long userNum, String userId, String userName, Long jobPostNum,
                         String jobPositionTitle, String jobPositionContent, String skill,
-                        String roleId, String roleName, String companyName,
+                        String roleId, String roleName,Long companyNum, String companyName,
                         String region, String nation,
                         int reward, LocalDateTime appliedDate) {
         super(applyNum, userNum,userId, userName, jobPostNum);
@@ -49,6 +49,7 @@ public class ApplyInfoDTO extends ApplyUserDTO {
         this.skill = skill;
         this.roleId = roleId;
         this.roleName = roleName;
+        this.companyNum= companyNum;
         this.companyName = companyName;
         this.region = region;
         this.nation = nation;

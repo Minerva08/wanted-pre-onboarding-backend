@@ -40,6 +40,7 @@ public class UserRepositoryImpl implements UserRepositoryCustom{
 
         return queryFactory.select(Projections.constructor(ApplyInfoDTO.class,
                         apply.applyNum,
+                        user.userNum,
                         user.userId,
                         user.userName,
                         apply.jobPosition.num,
@@ -49,7 +50,6 @@ public class UserRepositoryImpl implements UserRepositoryCustom{
                         companyRole.role.roleId,
                         role.roleName, // Assuming you need roleName from Role
                         company.comNum,
-                        company.comId,
                         company.comName,
                         company.region,
                         company.nation,
