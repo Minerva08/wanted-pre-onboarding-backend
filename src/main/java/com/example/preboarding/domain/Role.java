@@ -20,6 +20,7 @@ public class Role {
     @SequenceGenerator(name = "role_seq_generator", sequenceName = "role_sequence",
             initialValue = 1, allocationSize = 1)
     private Long roleNum;
+    @Column(unique = true)
     private String roleId;
     private String roleName;
     @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, orphanRemoval = true)

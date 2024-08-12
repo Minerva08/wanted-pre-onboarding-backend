@@ -16,6 +16,7 @@ public class User {
             initialValue = 1, allocationSize = 1)
     private Long userNum;
     private String userName;
+    @Column(unique = true)
     private String userId;
     private String userPw;
     private Boolean applyStatus;

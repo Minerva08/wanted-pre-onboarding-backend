@@ -20,6 +20,7 @@ public class Company {
     @SequenceGenerator(name = "company_seq_generator", sequenceName = "company_sequence",
             initialValue = 1, allocationSize = 1)
     private Long comNum;
+    @Column(unique = true)
     private String comId;
     private String comName;
     private String nation;

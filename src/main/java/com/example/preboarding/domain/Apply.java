@@ -21,6 +21,7 @@ public class Apply {
     private Long applyNum;
     @OneToOne(fetch = FetchType.LAZY,cascade = CascadeType.PERSIST)
     @JoinColumn(name="user_num")
+    @Column(unique = true)
     private User user;
     @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.PERSIST)
     @JoinColumn(name="post_num")
