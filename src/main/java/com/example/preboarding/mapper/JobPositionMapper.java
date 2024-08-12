@@ -43,21 +43,5 @@ public class JobPositionMapper {
                 .build();
     }
 
-    public JobPostInfoRes toDto(List<JobPosition> entity) {
 
-        List<JobPostInfoRes.JobPost> jobPostList = new ArrayList<>();
-
-        for (JobPosition jobPosition : entity) {
-
-            jobPostList.add(JobPostInfoRes.JobPost.builder()
-                    .jobPosition(jobPosition)
-                    .build()
-            );
-
-        }
-
-        return JobPostInfoRes.builder()
-                .jobPostList(jobPostList)
-                .build();
-    }
 }
