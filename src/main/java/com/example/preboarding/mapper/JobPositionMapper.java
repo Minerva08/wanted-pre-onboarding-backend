@@ -4,8 +4,7 @@ package com.example.preboarding.mapper;
 import com.example.preboarding.domain.CompanyRole;
 import com.example.preboarding.domain.Date;
 import com.example.preboarding.domain.JobPosition;
-import com.example.preboarding.dto.request.JobPositionPostReq;
-import com.example.preboarding.dto.request.JobPostionAddReq;
+import com.example.preboarding.dto.request.JobPostAddReq;
 import com.example.preboarding.dto.response.JobPostInfoRes;
 import com.example.preboarding.repository.companyRole.CompanyRoleRepository;
 import lombok.AllArgsConstructor;
@@ -24,7 +23,7 @@ public class JobPositionMapper {
     private final String formatter = "yyyy-MM-dd HH:mm:ss";
 
 
-    public JobPosition toEntity(JobPostionAddReq dto) {
+    public JobPosition toEntity(JobPostAddReq dto) {
         List<CompanyRole> companyRole = companyRoleRepository.findByCompanyNumAndRoleNum(dto.getCompanyNum(),dto.getRoleNum());
 
         Date date = Date.builder()

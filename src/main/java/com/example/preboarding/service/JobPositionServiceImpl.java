@@ -7,8 +7,8 @@ import com.example.preboarding.domain.Role;
 import com.example.preboarding.dto.ApplyUserDTO;
 import com.example.preboarding.dto.JobPostSearchDTO;
 import com.example.preboarding.dto.SummaryJobPost;
-import com.example.preboarding.dto.request.JobPositionPostReq;
-import com.example.preboarding.dto.request.JobPostionAddReq;
+import com.example.preboarding.dto.request.JobPostReq;
+import com.example.preboarding.dto.request.JobPostAddReq;
 import com.example.preboarding.dto.response.JobPostInfoRes;
 import com.example.preboarding.exception.CustomException;
 import com.example.preboarding.exception.EnumResponseMessage;
@@ -48,9 +48,8 @@ public class JobPositionServiceImpl implements JobPositionsService {
 
 
     @Override
-    public Long registPosition(JobPostionAddReq postReq) {
-
-        CompanyRole companyRole = validJobPosition(postReq.getCompanyNum(),postReq.getRoleNum());
+    public Long registPosition(JobPostAddReq postReq) {
+        CompanyRole companyRole = companyRoleRepository.findByCompanyNumAndRoleNum(postReq.getCompanyNum(), postReq.getRoleNum()).stream().findFirst().get();
 
         if(companyRole==null){
             CustomException ex = new CustomException(HttpErrorCode.CONFLICT, EnumResponseMessage.MESSAGE_ER_C_ROLE);
@@ -96,27 +95,19 @@ public class JobPositionServiceImpl implements JobPositionsService {
     @Override
     @Transactional(readOnly = true)
     public JobPostInfoRes getJobPostDetail(Long postNum) {
-        JobPosition jobPostDetail = validJobPost(postNum);
+        JobPosition jobPositionInfo = jobPositionRepository.findById(postNum).get();
 
-        List<SummaryJobPost> otherPositionList = jobPositionRepository.findCompanyOtherPosition(jobPostDetail.getCompany().getComNum(), jobPostDetail.getNum())
+        List<SummaryJobPost> otherPositionList = jobPositionRepository.findCompanyOtherPosition(jobPositionInfo.getCompany().getComNum(), jobPositionInfo.getNum())
                 .stream().map(SummaryJobPost::new).toList();
 
         return JobPostInfoRes.builder()
-                .detail(JobPostInfoRes.JobPostDetail.builder().jobPosition(jobPostDetail).build())
+                .detail(JobPostInfoRes.JobPostDetail.builder().jobPosition(jobPositionInfo).build())
                 .otherPostList(otherPositionList).build();
     }
 
-    private JobPosition validJobPost(Long postNum) {
-        JobPosition jobPostDetail = jobPositionRepository.findById(postNum).orElseThrow(() -> {
-            CustomException ex = new CustomException(HttpErrorCode.BAD_REQUEST, EnumResponseMessage.MESSAGE_NO_JOB_POSITION);
-            ex.addErrorDetail("postNum", String.valueOf(postNum));
-            throw ex;
-        });
-        return jobPostDetail;
-    }
 
     @Override
-    public Long updateJobPostInfo(Long postNum, JobPositionPostReq modJobPost) {
+    public Long updateJobPostInfo(Long postNum, JobPostReq modJobPost) {
 
         AtomicReference<Long> updatePostNum = new AtomicReference<>(0l);
 
@@ -184,17 +175,4 @@ public class JobPositionServiceImpl implements JobPositionsService {
 
     }
 
-    private CompanyRole validJobPosition(long comNum, long roleNum) {
-
-        List<CompanyRole> byCompanyNumAndRoleNum = companyRoleRepository.findByCompanyNumAndRoleNum(comNum, roleNum);
-
-        if(byCompanyNumAndRoleNum==null){
-            CustomException ex = new CustomException(HttpErrorCode.INTER_SERVER_ERROR,EnumResponseMessage.MESSAGE_ER_C_ROLE);
-            ex.addErrorDetail("comNum",String.valueOf(comNum));
-            ex.addErrorDetail("roleNum",String.valueOf(roleNum));
-            throw ex;
-        }
-
-        return byCompanyNumAndRoleNum.stream().findFirst().get();
-    }
 }

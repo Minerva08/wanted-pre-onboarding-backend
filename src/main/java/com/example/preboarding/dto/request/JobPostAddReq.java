@@ -5,9 +5,9 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
 @Getter
-public class JobPostionAddReq extends JobPositionPostReq{
+public class JobPostAddReq extends JobPostReq{
     @NotNull(message = "not null")
-    @Schema(example = "1", description="요청할 회사 번호")
+    @Schema(example = "1", description="공고를 등록할 회사 번호")
     private Long companyNum;
 
 }

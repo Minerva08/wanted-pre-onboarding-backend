@@ -1,20 +1,18 @@
 package com.example.preboarding.controller;
 
-import com.example.preboarding.dto.request.JobPositionPostReq;
-import com.example.preboarding.dto.request.JobPostionAddReq;
+import com.example.preboarding.dto.request.JobPostReq;
+import com.example.preboarding.dto.request.JobPostAddReq;
 import com.example.preboarding.dto.response.JobPositionPostRes;
 import com.example.preboarding.dto.response.JobPostInfoRes;
 import com.example.preboarding.dto.response.UpdateStatusRes;
 import com.example.preboarding.exception.CustomException;
 import com.example.preboarding.service.JobPositionsService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import org.springframework.data.web.PageableDefault;
@@ -22,8 +20,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import org.springframework.data.domain.Pageable;
-
-import java.util.List;
 
 @RestController
 @AllArgsConstructor
@@ -42,7 +38,7 @@ public class JobPositionController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = CustomException.class))),
             @ApiResponse(responseCode = "504", description = "Gateway Timeout", content = @Content(schema = @Schema(implementation = CustomException.class))),
     })
-    public JobPositionPostRes registJobPositionPost(@RequestBody @NotNull JobPostionAddReq registInfo){
+    public JobPositionPostRes registJobPositionPost(@RequestBody @NotNull JobPostAddReq registInfo){
         try{
             Long savePostNum = jobPositionsService.registPosition(registInfo);
 
@@ -125,7 +121,7 @@ public class JobPositionController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = CustomException.class))),
             @ApiResponse(responseCode = "504", description = "Gateway Timeout", content = @Content(schema = @Schema(implementation = CustomException.class))),
     })
-    public UpdateStatusRes modifyJobPost(@PathVariable("postNum") Long postNum, @RequestBody @NotNull JobPositionPostReq modJobPost ){
+    public UpdateStatusRes modifyJobPost(@PathVariable("postNum") Long postNum, @RequestBody @NotNull JobPostReq modJobPost ){
 
         try{
 

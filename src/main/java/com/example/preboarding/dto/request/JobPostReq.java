@@ -1,14 +1,14 @@
 package com.example.preboarding.dto.request;
 
-import com.example.preboarding.domain.Date;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
 @NotNull
 @Getter
-public class JobPositionPostReq {
-    @NotNull(message = "not null")
+public class JobPostReq {
+    @NotEmpty(message = "Required")
     @Schema(example = "원티드 백엔드 서버 개발자 모집 공고", description="요청할 채용 공고 제목")
     private String postTitle;
     @NotNull(message = "not null")
