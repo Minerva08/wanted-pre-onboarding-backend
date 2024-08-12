@@ -1,6 +1,7 @@
 package com.example.preboarding.controller;
 
 import com.example.preboarding.domain.CompanyRole;
+import com.example.preboarding.dto.JobRoleInfoDTO;
 import com.example.preboarding.dto.response.CompanyPosition;
 import com.example.preboarding.dto.response.JobPostInfoRes;
 import com.example.preboarding.dto.response.UpdateStatusRes;
@@ -22,7 +23,7 @@ import java.util.List;
 
 @RestController
 @AllArgsConstructor
-@RequestMapping("/jobposition")
+@RequestMapping("/jobpositions")
 @Tag(name = "회사별 직무 관련 API", description = "Swagger API")
 public class CompanyPositionController {
 
@@ -37,9 +38,9 @@ public class CompanyPositionController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = CustomException.class))),
             @ApiResponse(responseCode = "504", description = "Gateway Timeout", content = @Content(schema = @Schema(implementation = CustomException.class))),
     })
-    public CompanyPosition getPositionList (@Parameter Long comNum){
+    public CompanyPosition getPositionList (@RequestParam(name = "comNum") Long comNum){
         try{
-            List<CompanyRole> companyPositionList = companyRoleService.getCompanyRoleList(comNum, null);
+            List<JobRoleInfoDTO> companyPositionList = companyRoleService.getCompanyRoleList(comNum, null);
             return CompanyPosition.builder()
                     .message("회사의 직무가 조회 되었습니다")
                     .status(HttpStatus.OK.value())
@@ -62,12 +63,14 @@ public class CompanyPositionController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = CustomException.class))),
             @ApiResponse(responseCode = "504", description = "Gateway Timeout", content = @Content(schema = @Schema(implementation = CustomException.class))),
     })
-    public UpdateStatusRes deleteCompanyJobPostion (@Parameter Long comNum, @Parameter Long roleNum){
+    public UpdateStatusRes deleteCompanyJobPosition (@RequestParam(name = "comNum") Long comNum, @RequestParam(name = "roleNum") Long roleNum){
         try{
             companyRoleService.deleteCompanyRole(comNum, roleNum);
             return UpdateStatusRes.builder()
                     .message("해당 직무가 정상적으로 삭제 되었습니다")
                     .status(HttpStatus.OK.value())
+                    .comNum(comNum)
+                    .roleNum(roleNum)
                     .build();
 
         }catch (CustomException e){

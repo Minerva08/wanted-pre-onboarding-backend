@@ -12,5 +12,7 @@ public class UpdateStatusRes extends CommonResponse{
     private Long postNum;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Long comNum;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private Long roleNum;
 
 }

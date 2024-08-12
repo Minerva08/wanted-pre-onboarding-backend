@@ -23,7 +23,7 @@ public class RoleValidationAspect {
     @Autowired
     private HttpServletRequest request;
 
-    @Pointcut("execution(* com.example.preboarding.controller.CompanyPositionController.deleteCompanyJobPostion(..))")
+    @Pointcut("execution(* com.example.preboarding.controller.CompanyPositionController.deleteCompanyJobPosition(..))")
     public void deleteJobPositionController() {}
 
     @Before("deleteJobPositionController()")
