@@ -54,7 +54,7 @@ public class CompanyPositionController {
     }
 
     @DeleteMapping()
-    @Operation(summary = "회사의 등록된 직무 삭제" ,description = "등록된 채용 공고 조회")
+    @Operation(summary = "회사의 등록된 직무 삭제" ,description = "회사의 직무 삭제 및 관련 채용 공고 삭제")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Request Success", content = @Content(schema = @Schema(implementation = JobPostInfoRes.class))),
             @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(schema = @Schema(implementation = CustomException.class))),
@@ -62,7 +62,7 @@ public class CompanyPositionController {
             @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = CustomException.class))),
             @ApiResponse(responseCode = "504", description = "Gateway Timeout", content = @Content(schema = @Schema(implementation = CustomException.class))),
     })
-    public UpdateStatusRes getPositionList (@Parameter Long comNum, @Parameter Long roleNum){
+    public UpdateStatusRes deleteCompanyJobPostion (@Parameter Long comNum, @Parameter Long roleNum){
         try{
             companyRoleService.deleteCompanyRole(comNum, roleNum);
             return UpdateStatusRes.builder()

@@ -31,4 +31,9 @@ public class CompanyServiceImpl implements CompanyService {
         return companyRepository.save(addCom).getComNum();
 
     }
+
+    @Override
+    public void deleteCompany(Long comNum) {
+        companyRepository.deleteById(comNum);
+    }
 }
