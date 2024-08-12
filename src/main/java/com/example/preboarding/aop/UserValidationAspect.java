@@ -82,9 +82,8 @@ class UserValidationAspect {
     public void cancelApplyController(JoinPoint joinPoint) throws MethodArgumentNotValidException,CustomException {
         log.info("Validating ApplyNum");
 
-        List<String> collect = Arrays.stream(request.getRequestURI().split("/")).collect(Collectors.toList());
-        Collections.reverse(collect);
-        String applyNum = collect.get(0);
+        List<String> urlList = Arrays.stream(request.getRequestURI().split("/")).collect(Collectors.toList());
+        String applyNum = urlList.get(urlList.size()-1);
         log.info("applyNum : {}",applyNum);
 
         applyRepository.findById(Long.valueOf(applyNum)).orElseThrow(()->{
