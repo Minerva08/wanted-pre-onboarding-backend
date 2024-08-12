@@ -36,6 +36,9 @@ public class JobPostValidationAspect {
     @Pointcut("execution(* com.example.preboarding.controller.JobPositionController.modifyJobPost(..))")
     public void updateController() {}
 
+    @Pointcut("execution(* com.example.preboarding.controller.JobPositionController.getDetail(..))")
+    public void detailController() {}
+
     @Before("registController()")
     public void registController(JoinPoint joinPoint) throws CustomException {
         log.info("Start Validating JobPositionAddReq");
@@ -81,16 +84,8 @@ public class JobPostValidationAspect {
 
     @Before("updateController()")
     public void updateController(JoinPoint joinPoint) throws CustomException {
-        List<String> urlList = Arrays.stream(request.getRequestURI().split("/")).toList();
-        Collections.reverse(urlList);
-        String postNum = urlList.get(0);
-        log.info("Valid postNum : {}",postNum);
 
-        jobPositionRepository.findById(Long.valueOf(postNum)).orElseThrow(()->{
-            CustomException ex = new CustomException(HttpErrorCode.BAD_REQUEST,EnumResponseMessage.MESSAGE_NO_JOB_POSITION);
-            ex.addErrorDetail("postNum",postNum);
-            throw ex;
-        });
+        validJobPostNum(request);
 
 
         for (Object arg : joinPoint.getArgs()) {
@@ -112,5 +107,22 @@ public class JobPostValidationAspect {
         }
         log.info("Success Validated update JobPost.");
 
+    }
+
+    @Before("detailController()")
+    public void detailController(JoinPoint joinPoint) throws CustomException {
+        validJobPostNum(request);
+    }
+    private void validJobPostNum(HttpServletRequest request) {
+        List<String> urlList = Arrays.stream(request.getRequestURI().split("/")).toList();
+        Collections.reverse(urlList);
+        String postNum = urlList.get(0);
+        log.info("Valid postNum : {}",postNum);
+
+        jobPositionRepository.findById(Long.valueOf(postNum)).orElseThrow(()->{
+            CustomException ex = new CustomException(HttpErrorCode.BAD_REQUEST,EnumResponseMessage.MESSAGE_NO_JOB_POSITION);
+            ex.addErrorDetail("postNum",postNum);
+            throw ex;
+        });
     }
 }

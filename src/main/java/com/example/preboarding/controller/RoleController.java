@@ -47,7 +47,7 @@ public class RoleController {
 
             return RegistRes.builder()
                     .status(HttpStatus.OK.value())
-                    .message("새로운 회사가 등록 되었습니다.")
+                    .message("새로운 직무가 등록 되었습니다.")
                     .registNum(roleNum)
                     .build();
 
