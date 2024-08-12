@@ -76,6 +76,7 @@ public class JobPositionController {
 
             searchList.setMessage("조건에 맞는 채공 공고가 검색 되었습니다");
             searchList.setStatus(HttpStatus.OK.value());
+            searchList.setPageNum(pageable.getPageNumber());
             return searchList;
 
         }catch (CustomException e){
