@@ -114,9 +114,9 @@ public class JobPostValidationAspect {
         validJobPostNum(request);
     }
     private void validJobPostNum(HttpServletRequest request) {
+        log.info("Request Url : {}",request.getRequestURI());
         List<String> urlList = Arrays.stream(request.getRequestURI().split("/")).toList();
-        Collections.reverse(urlList);
-        String postNum = urlList.get(0);
+        String postNum = urlList.get(urlList.size()-1);
         log.info("Valid postNum : {}",postNum);
 
         jobPositionRepository.findById(Long.valueOf(postNum)).orElseThrow(()->{
