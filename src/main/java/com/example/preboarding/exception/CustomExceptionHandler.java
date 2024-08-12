@@ -1,5 +1,7 @@
 package com.example.preboarding.exception;
 
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -12,7 +14,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @ControllerAdvice
-
 public class CustomExceptionHandler {
 
     @ExceptionHandler(CustomException.class)
@@ -26,6 +27,17 @@ public class CustomExceptionHandler {
         body.put("details", ex.getDetail());
 
         return new ResponseEntity<>(body, HttpStatusCode.valueOf(ex.getErrorCode().getStatus()));
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<String> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
+        // 유니크 제약 조건 위반 시 처리
+        return new ResponseEntity<>("Duplicate entry found", HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
 }
